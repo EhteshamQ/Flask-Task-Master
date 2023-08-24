@@ -1,0 +1,51 @@
+{% extends 'base.html' %} 
+
+{% block head %}
+    <title>Task Master</title>
+{% endblock %} 
+
+{% block body %}
+<div class="content">
+    <h1>Task Master</h1>
+      
+    
+    {% if tasks|length == 0 %}<h3>You have no tasks, Add tasks to continue</h3>{% endif %}
+    
+    <table>
+            <tr>
+                <th>Checked</th>
+                <th>Task</th>
+                <th>Added</th>
+                <th>Actions</th>
+            </tr>
+            
+            {% for task in tasks %}
+            <tr> 
+                <td><input type="checkbox" id="checkbox-{{task.id}}"      onchange=" ( async () => {
+                   let checkbox = document.querySelector('#checkbox-{{task.id}}')
+                   checkbox.disabled = true 
+                   if(checkbox.checked){
+                        await fetch(`/tasks/check/{{task.id}}?checked=1`, {   method: 'PATCH',
+                     });}
+                else
+                await fetch(`/tasks/check/{{task.id}}?checked=0`, {   method: 'PATCH' });
+                checkbox.disabled = false;
+                } )()" name="checkbox" {% if task.complete == 1 %}checked{% endif %} ></td>
+                <td>{{task.content}}</td>
+                <td>{{ task.date_created.date() }}</td>
+                <td>
+                   
+                    <a class="anchor" href="/tasks/delete/{{task.id}}">Delete</a>
+                    <a class="anchor" href="/tasks/update/{{task.id}}">Update</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <form action="/" method="post">
+            <input type="text" name="content" id="content">
+            <input type="submit" value="Add Task">
+        </form>
+
+</div>
+{% endblock %}
